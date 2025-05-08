@@ -1,54 +1,86 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Box, Heading, Text } from "@chakra-ui/react";
-//import ChordDisplay from "../cmps/ChordDisplay.jsx";
-import SongLoader from "../cmps/SongLoader.jsx";
-import { getLoggedInUser } from "../services/auth.service.js"
-import { connectSocket, disconnectSocket } from "../services/socket.service.js";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Input, Button, Heading, VStack, Text } from "@chakra-ui/react";
+import { toast } from "react-toastify";
 
+import { createSession, joinSession } from "../services/session.service";
+import { getLoggedInUser } from "../services/auth.service";
 
-function SessionPage() {
-
-  const { id: sessionId } = useParams();
-  const user = getLoggedInUser();
+function SessionForm() {
+  const [user, setUser] = useState(null);
+  const [sessionId, setSessionId] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if(user && sessionId){
-      connectSocket(sessionId, user.username);
+    const userFromStorage = getLoggedInUser();
+    setUser(userFromStorage);
+  }, []);
+
+  if (!user) return null;
+
+  async function handleCreateSession() {
+    try {
+      const res = await createSession({ userId: user.id });
+      const createdSession = res.data.session;
+      navigate(`/session/${createdSession.sessionId}`);
+    } catch (error) {
+      console.error("Error creating session:", error);
+      toast.error("Failed to create session.");
     }
-    return () => {
-      disconnectSocket();
-    };
-  }, [sessionId]);
-
-
- 
-  const [currentSong, setCurrentSong] = useState(null);
-
-  
-
-  function handleLoadSong(songName) {
-    setCurrentSong({ title: songName, chords: ["C", "G", "Am", "F"] }); //mock for now
   }
 
-  return (
-    <Box maxW="4xl" mx="auto" mt={10} p={6}>
-      {user.role === "admin" && <SongLoader onLoad={handleLoadSong} />}
-      <Heading size="lg" mb={4}>
-        🎸 Live Jam Session
-      </Heading>
-      <Text fontSize="md" mb={6}>
-        Session ID: <strong>{sessionId}</strong>
-      </Text>
+  async function handleJoinSession() {
+    if (!sessionId) {
+      return toast.error("Please enter a session ID");
+    }
 
-      {/* Main chord UI component */}
-      {/* <ChordDisplay
-        sessionId={sessionId}
-        instrument={user.instrument}
-        song={currentSong}
-      /> */}
+    try {
+      const res = await joinSession(sessionId, { userId: user.id });
+      navigate(`/session/${res.data.sessionId}`);
+    } catch (error) {
+      console.error("Error joining session:", error);
+      toast.error("Failed to join session.");
+    }
+  }
+  console.log("User loaded in SessionForm:", user);
+
+  return (
+    <Box
+      maxW="sm"
+      mx="auto"
+      mt={10}
+      p={6}
+      borderWidth={1}
+      borderRadius="md"
+      boxShadow="md"
+    >
+      <Heading mb={6} size="lg" textAlign="center">
+        Welcome, {user.username}
+      </Heading>
+      <Text>Role: {user.role}</Text>
+
+      <VStack spacing={4}>
+        <Text>
+          Instrument: <strong>{user.instrument}</strong>
+        </Text>
+
+        {user?.role === "admin" && (
+          <Button colorScheme="teal" width="100%" onClick={handleCreateSession}>
+            Create New Session
+          </Button>
+        )}
+
+        <Input
+          placeholder="Enter session ID to join"
+          value={sessionId}
+          onChange={(e) => setSessionId(e.target.value)}
+        />
+        <Button colorScheme="blue" width="100%" onClick={handleJoinSession}>
+          Join Session
+        </Button>
+      </VStack>
     </Box>
   );
 }
 
-export default SessionPage;
+export default SessionForm;

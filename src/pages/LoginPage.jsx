@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Box, Input, Button, Heading, VStack, Select } from "@chakra-ui/react";
 import { toast } from "react-toastify";
 
-import { signup, login, getLoggedInUser } from "../services/auth.service";
+import {
+  signup,
+  login,
+  getLoggedInUser,
+  isLoggedIn,
+} from "../services/auth.service.js";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -11,22 +16,19 @@ function LoginPage() {
   const [instrument, setInstrument] = useState("");
   const navigate = useNavigate();
 
-
   useEffect(() => {
     if (isLoggedIn()) {
       navigate("/");
     }
   }, []);
 
-
   async function handleSignup() {
     if (!username || !password || !instrument) {
       return toast.error("Please fill all fields");
     }
+
     try {
-      await signup({ username, password, instrument });
-      toast.success("Signup successful!");
-      const user = getLoggedInUser();
+      const user = await signup({ username, password, instrument });
       toast.success(`Welcome, ${user.username}!`);
       navigate("/");
     } catch (err) {

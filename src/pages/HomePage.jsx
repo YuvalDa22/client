@@ -3,11 +3,12 @@ import SessionForm from '../cmps/SessionForm.jsx';
 
 function HomePage() {
   return (
-    <Container maxW="md" centerContent>
-      <Box w="100%" mt={10}>
-        <SessionForm />
-      </Box>
-    </Container>
+    <SessionForm />
+    // <Container maxW="md" centerContent>
+    //   <Box w="100%" mt={10}>
+    //     <SessionForm />
+    //   </Box>
+    // </Container>
   );
 }
 
