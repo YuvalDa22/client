@@ -1,5 +1,5 @@
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -30,7 +30,7 @@ export function getLoggedInUser() {
     if (!token) return null;
   
     try {
-      return jwt_decode(token); 
+      return jwtDecode(token); 
     } catch {
       return null;
     }
