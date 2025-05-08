@@ -65,9 +65,9 @@ function SessionForm() {
     } catch (error) {
       console.error("Error joining session:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to join session.',
-        status: 'error',
+        title: "Error",
+        description: "Failed to join session.",
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
@@ -75,7 +75,15 @@ function SessionForm() {
   }
 
   return (
-    <Box maxW="sm" mx="auto" mt={10} p={6} borderWidth={1} borderRadius="md" boxShadow="md">
+    <Box
+      maxW="sm"
+      mx="auto"
+      mt={10}
+      p={6}
+      borderWidth={1}
+      borderRadius="md"
+      boxShadow="md"
+    >
       <Heading mb={6} size="lg" textAlign="center">
         🎵 JaMoveo
       </Heading>
@@ -87,18 +95,10 @@ function SessionForm() {
           onChange={(e) => setUsername(e.target.value)}
         />
 
-        <Select
-          placeholder="Select instrument"
+        <InstrumentSelector
           value={instrument}
           onChange={(e) => setInstrument(e.target.value)}
-        >
-          <option value="vocals">Vocals</option>
-          <option value="guitar">Guitar</option>
-          <option value="drums">Drums</option>
-          <option value="bass">Bass</option>
-          <option value="saxophone">Saxophone</option>
-          <option value="keyboards">Keyboards</option>
-        </Select>
+        />
 
         <Button colorScheme="teal" width="100%" onClick={handleCreateSession}>
           Create New Session
