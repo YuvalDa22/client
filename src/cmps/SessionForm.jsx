@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import {
   Box,
   Input,
@@ -8,28 +7,22 @@ import {
   Button,
   Heading,
   VStack,
-  useToast,
 } from "@chakra-ui/react";
 
+import { toast } from "react-toastify";
 import InstrumentSelector from "./InstrumentSelector.jsx";
 import { createSession, joinSession } from "../services/session.service.js";
+
 
 function SessionForm() {
   const [username, setUsername] = useState("");
   const [instrument, setInstrument] = useState("");
   const [sessionId, setSessionId] = useState("");
-  const toast = useToast();
   const navigate = useNavigate();
 
   async function handleCreateSession() {
     if (!username || !instrument) {
-      return toast({
-        title: "Missing fields",
-        description: "Please enter your name and instruments.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      return toast.error("Please enter your name and instrument.");
     }
     try {
       const res = await createSession({ username, instrument });
@@ -37,25 +30,13 @@ function SessionForm() {
       navigate(`/session/${createdSession.sessionId}`);
     } catch (error) {
       console.error("Error creating session:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create session.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.error("Failed to create session.");
     }
   }
 
   async function handleJoinSession() {
     if (!username || !instrument || !sessionId) {
-      return toast({
-        title: "Missing fields",
-        description: "Please enter all fields to join a session.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      return toast.error("Please enter all fields to join a session.");
     }
 
     try {
@@ -64,13 +45,7 @@ function SessionForm() {
       navigate(`/session/${session.sessionId}`);
     } catch (error) {
       console.error("Error joining session:", error);
-      toast({
-        title: "Error",
-        description: "Failed to join session.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.error("Failed to join session.");
     }
   }
 

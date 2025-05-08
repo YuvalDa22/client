@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { Box, Heading, Text } from "@chakra-ui/react";
-import ChordDisplay from "../cmps/ChordDisplay.jsx";
+//import ChordDisplay from "../cmps/ChordDisplay.jsx";
 import SongLoader from "../cmps/SongLoader.jsx";
 
 const mockUser = {
@@ -28,11 +28,11 @@ function SessionPage() {
       </Text>
 
       {/* Main chord UI component */}
-      <ChordDisplay
+      {/* <ChordDisplay
         sessionId={sessionId}
         instrument={mockUser.instrument}
         song={currentSong}
-      />
+      /> */}
     </Box>
   );
 }

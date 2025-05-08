@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import SessionPage from "./pages/SessionPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App(){
   return (

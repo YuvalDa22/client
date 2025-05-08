@@ -1,5 +1,5 @@
 import { UseState } from 'react'
-import { Box, Inpot, Button, Heading, VStack } from '@chakra-ui/react'
+import { Box, Input, Button, Heading, VStack } from '@chakra-ui/react'
 
 function SongLoader({ onLoad }) {
     const [songQuery, setSongQuery] = UseState('')
