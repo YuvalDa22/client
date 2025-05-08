@@ -9,6 +9,7 @@ import {
   getLoggedInUser,
   isLoggedIn,
 } from "../services/auth.service.js";
+import InstrumentSelector from "../cmps/InstrumentSelector.jsx"
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -73,18 +74,10 @@ function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Select
-          placeholder="Select instrument"
-          value={instrument}
-          onChange={(e) => setInstrument(e.target.value)}
-        >
-          <option value="vocals">Vocals</option>
-          <option value="guitar">Guitar</option>
-          <option value="drums">Drums</option>
-          <option value="bass">Bass</option>
-          <option value="saxophone">Saxophone</option>
-          <option value="keyboards">Keyboards</option>
-        </Select>
+        <InstrumentSelector
+        value ={instrument}
+        onChange={(e) => setInstrument(e.target.value)}
+        />
         <Button onClick={handleSignup} colorScheme="teal" width="100%">
           Signup
         </Button>

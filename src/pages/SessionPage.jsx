@@ -12,11 +12,10 @@ function SessionForm() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userFromStorage = getLoggedInUser();
-    setUser(userFromStorage);
+    const storedUser = getLoggedInUser();
+    setUser(storedUser);
   }, []);
 
-  if (!user) return null;
 
   async function handleCreateSession() {
     try {
@@ -42,7 +41,10 @@ function SessionForm() {
       toast.error("Failed to join session.");
     }
   }
-  console.log("User loaded in SessionForm:", user);
+
+  if(!user) {
+    return null;
+  }
 
   return (
     <Box
@@ -64,11 +66,11 @@ function SessionForm() {
           Instrument: <strong>{user.instrument}</strong>
         </Text>
 
-        {user?.role === "admin" && (
+        {/* {(user?.role === "admin") && (
           <Button colorScheme="teal" width="100%" onClick={handleCreateSession}>
             Create New Session
           </Button>
-        )}
+        )} */}
 
         <Input
           placeholder="Enter session ID to join"
