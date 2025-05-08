@@ -13,6 +13,8 @@ function SessionPage() {
   const { sessionId } = useParams();
   const [currentSong, setCurrentSong] = useState(null);
 
+  
+
   function handleLoadSong(songName) {
     setCurrentSong({ title: songName, chords: ["C", "G", "Am", "F"] }); //mock for now
   }
