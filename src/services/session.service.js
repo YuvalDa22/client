@@ -1,11 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:5001/api/session';
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-export async function createSession(userData){
-    return await axios.post(`${BASE_URL}/create`, userData)
-}
+export const createSession = (data) => axios.post(`${API}/session/create`, data);
 
-export async function joinSession(sessionId, userData){
-    return await axios.post(`${BASE_URL}/join/${sessionId}`, userData)
-}
+export const joinSession = (sessionId, data) => axios.put(`${API}/session/${sessionId}/join`, data);
