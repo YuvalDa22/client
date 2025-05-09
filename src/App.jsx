@@ -3,13 +3,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Navigate } from "react-router-dom";
 
-
 import HomePage from "./pages/HomePage";
 import SessionPage from "./pages/SessionPage";
 import LoginPage from "./pages/LoginPage";
 import LogoutButton from "./cmps/LogoutButton";
 import { isLoggedIn } from "./services/auth.service";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import AdminSignupPage from "./pages/AdminSignupPage";
+import AdminMainPage from "./pages/AdminMainPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin-signup" element={<AdminSignupPage />} />
 
           {/* Protected Routes */}
           <Route
@@ -38,6 +40,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminMainPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Fallback Route */}
           <Route
             path="*"
