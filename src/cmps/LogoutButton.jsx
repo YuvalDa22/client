@@ -11,7 +11,7 @@ function LogoutButton() {
   }
 
   return (
-    <Button onClick={handleLogout} colorScheme="red" variant="outline">
+    <Button onClick={handleLogout} colorScheme="red" variant="outline" ml={4} mt={4}>
       Logout
     </Button>
   );
