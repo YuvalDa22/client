@@ -37,6 +37,16 @@ export function onSongUpdate(callback) {
   socket.on("song-updated", callback);
 }
 
+// Emits a "session-ended" event to the server
+export function emitEndSession(sessionId) {
+  socket.emit("end-session", { sessionId });
+}
+
+// Listen for the "session-ended" event from the server
+export function onSessionEnded(callback) {
+  socket.on("session-ended", callback);
+}
+
 //disconnect from the server
 export function disconnectSocket() {
   socket.disconnect();

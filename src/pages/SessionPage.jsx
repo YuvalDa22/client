@@ -21,6 +21,8 @@ import {
   onUserListUpdate,
   onCountdownStarted,
   emitStartCountdown,
+  emitEndSession,
+  onSessionEnded,
 } from "../services/socket.service.js";
 
 function SessionPage() {
@@ -35,26 +37,37 @@ function SessionPage() {
   useEffect(() => {
     if (user && sessionId) {
       connectSocket(sessionId, user.username, user.role);
-
+  
       onSongUpdate((song) => {
         if (song) {
           setCurrentSong(song);
           setPhase("idle");
         }
       });
-
+  
       onCountdownStarted(() => {
         setPhase("countdown");
         setCount(3);
       });
-
+  
       onUserListUpdate((users) => setUsersInSession(users));
+  
+      
+      onSessionEnded(() => {
+        disconnectSocket();
+        if (user.role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/";
+        }
+      });
     }
-
+  
     return () => {
       disconnectSocket();
     };
   }, [sessionId]);
+  
 
   useEffect(() => {
     if (phase === "countdown" && count > 0) {
@@ -116,6 +129,13 @@ function SessionPage() {
               size="sm"
             >
               Start Countdown
+            </Button>
+            <Button
+              onClick={() => emitEndSession(sessionId)}
+              colorScheme="gray"
+              size="sm"
+            >
+              Quit Session
             </Button>
           </VStack>
         )}
