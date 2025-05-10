@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Heading, Text, List, ListItem } from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Text,
+  List,
+  ListItem,
+  Button,
+  VStack,
+} from "@chakra-ui/react";
 
 import AdminSongPicker from "../cmps/AdminSongPicker.jsx";
 import ChordDisplay from "../cmps/ChordDisplay.jsx";
@@ -12,6 +20,7 @@ import {
   onSongUpdate,
   onUserListUpdate,
   onCountdownStarted,
+  emitStartCountdown,
 } from "../services/socket.service.js";
 
 function SessionPage() {
@@ -28,8 +37,10 @@ function SessionPage() {
       connectSocket(sessionId, user.username, user.role);
 
       onSongUpdate((song) => {
-        setCurrentSong(song);
-        setPhase("idle");
+        if (song) {
+          setCurrentSong(song);
+          setPhase("idle");
+        }
       });
 
       onCountdownStarted(() => {
@@ -47,17 +58,20 @@ function SessionPage() {
 
   useEffect(() => {
     if (phase === "countdown" && count > 0) {
-      const timer = setTimeout(() => {
-        setCount((prev) => prev - 1);
-      }, 1000);
+      const timer = setTimeout(() => setCount((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
     } else if (phase === "countdown" && count === 0) {
-      setPhase("display");
+      setPhase("idle");
     }
   }, [phase, count]);
 
   function handleLoadSong(song) {
     setCurrentSong(song);
+  }
+
+  function handleClearSong() {
+    setCurrentSong(null);
+    setPhase("idle");
   }
 
   if (!user) return null;
@@ -72,34 +86,46 @@ function SessionPage() {
         Session ID: <strong>{sessionId}</strong>
       </Text>
 
-      {user.role === "admin" && (
-        <>
-          <Box mt={6}>
-            <Heading size="sm" mb={2}>
-              Participants:
-            </Heading>
+      <Box mt={6}>
+        <Heading size="sm" mb={2}>
+          Participants:
+        </Heading>
+        <List spacing={1} mb={4}>
+          {usersInSession?.map((user, idx) => (
+            <ListItem key={idx}>
+              {user.username} ({user.role})
+            </ListItem>
+          ))}
+        </List>
 
-            <List spacing={1}>
-              {usersInSession?.map((user, idx) => (
-                <ListItem key={idx}>
-                  {user.username} ({user.role})
-                </ListItem>
-              ))}
-            </List>
+        {user.role === "admin" && !currentSong && (
+          <AdminSongPicker
+            sessionId={sessionId}
+            onSongSelected={handleLoadSong}
+          />
+        )}
 
-            <AdminSongPicker
-              sessionId={sessionId}
-              onSongSelected={handleLoadSong}
-            />
-          </Box>
-        </>
-      )}
+        {user.role === "admin" && currentSong && (
+          <VStack mt={4} align="start">
+            <Button onClick={handleClearSong} colorScheme="red" size="sm">
+              Clear Song
+            </Button>
+            <Button
+              onClick={() => emitStartCountdown(sessionId)}
+              colorScheme="green"
+              size="sm"
+            >
+              Start Countdown
+            </Button>
+          </VStack>
+        )}
 
-      {!currentSong && user.role !== "admin" && (
-        <Text mt={6} fontSize="lg" textAlign="center" color="gray.500">
-          Waiting for the admin to load a song...
-        </Text>
-      )}
+        {user.role !== "admin" && !currentSong && (
+          <Text mt={6} fontSize="lg" textAlign="center" color="gray.500">
+            Waiting for the admin to load a song...
+          </Text>
+        )}
+      </Box>
 
       {currentSong && (
         <ChordDisplay

@@ -9,7 +9,17 @@ export async function fetchSongs(search = "") {
 export async function fetchSongById(id) {
   try {
     const res = await axios.get(`${API}/song/${id}`);
-    return res.data; // data returned as JSON
+    const data = res.data;
+
+    // If raw array, wrap with name
+    if (Array.isArray(data)) {
+      return {
+        name: id.replace(/_/g, ' '), 
+        content: data,
+      };
+    }
+
+    return data;
   } catch (error) {
     console.error("Error fetching song:", error);
     return null;

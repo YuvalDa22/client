@@ -40,6 +40,7 @@ function AdminSongPicker({ sessionId, onSongSelected }) {
 
   async function handleSelect(song) {
     const fullSong = await fetchSongById(song.id);
+    console.log("Selected song:", fullSong);
 
     // If in session, emit to socket
     if (sessionId) {
