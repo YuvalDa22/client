@@ -2,7 +2,7 @@
 
 This is the React frontend for **Jamoveo**, a collaborative jam session app allowing musicians to join virtual rehearsals, see synchronized song lyrics and chords, and follow the admin's live control.
 
-Link to Vercel - client-7umyigmjq-yuval-dadons-projects.vercel.app
+Link to Vercel - client-seven-silk-46.vercel.app
 
 ## Features
 
