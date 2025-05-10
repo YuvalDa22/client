@@ -2,9 +2,9 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
+console.log("API URL:", API);
 
 export async function signup(credentials) {
-  console.log(import.meta.env.VITE_API_URL)
   const res = await axios.post(`${API}/auth/signup`, credentials);
   const token = res.data.token;
 
