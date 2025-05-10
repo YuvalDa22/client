@@ -1,25 +1,26 @@
 import { useEffect, useState } from "react";
 import { Box, Heading, Text, VStack } from "@chakra-ui/react";
-import useSound from 'use-sound';
-import beepSfx from '../assets/beep.mp3';
+import useSound from "use-sound";
+import beepSfx from "../assets/beep.mp3";
+import { onCountdownStarted } from "../services/socket.service";
 
 function ChordDisplay({ song, instrument }) {
-  const [phase, setPhase] = useState("idle"); 
+  const [phase, setPhase] = useState("idle");
   const [count, setCount] = useState(3);
   const [playBeep] = useSound(beepSfx);
   const showChords = instrument !== "vocals";
 
   useEffect(() => {
-    if (song) {
+    onCountdownStarted(() => {
       setPhase("countdown");
       setCount(3);
-    }
-  }, [song]);
+    });
+  }, []);
 
   useEffect(() => {
     if (phase === "countdown" && count > 0) {
       playBeep();
-      const timer = setTimeout(() => setCount(c => c - 1), 1000);
+      const timer = setTimeout(() => setCount((c) => c - 1), 1000);
       return () => clearTimeout(timer);
     } else if (phase === "countdown" && count === 0) {
       setPhase("display");
@@ -31,8 +32,12 @@ function ChordDisplay({ song, instrument }) {
   if (phase === "countdown") {
     return (
       <Box mt={8} textAlign="center">
-        <Heading size="lg" mb={4}>Are you ready to jam?</Heading>
-        <Text fontSize="6xl" color="teal.400">{count > 0 ? count : null}</Text>
+        <Heading size="lg" mb={4}>
+          Are you ready to jam?
+        </Heading>
+        <Text fontSize="6xl" color="teal.400">
+          {count > 0 ? count : null}
+        </Text>
       </Box>
     );
   }
@@ -48,7 +53,7 @@ function ChordDisplay({ song, instrument }) {
             <Box key={lineIdx}>
               {showChords && (
                 <Text fontFamily="monospace" fontSize="sm" color="teal.500">
-                  {line.map(word =>
+                  {line.map((word) =>
                     word.chords
                       ? `${word.chords} `.padEnd(word.lyrics.length + 2)
                       : " ".repeat(word.lyrics.length + 2)

@@ -22,6 +22,16 @@ export function emitLoadSong(sessionId, song) {
   socket.emit("load-song", { sessionId, song });
 }
 
+// Emits a "start-countdown" event to the server
+export function emitStartCountdown(sessionId) {
+  socket.emit("start-countdown", { sessionId });
+}
+
+// Listen for the "countdown-started" event from the server
+export function onCountdownStarted(callback) {
+  socket.on("countdown-started", callback);
+}
+
 // listen for song updates
 export function onSongUpdate(callback) {
   socket.on("song-updated", callback);

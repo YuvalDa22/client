@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Heading, Text, List, ListItem } from "@chakra-ui/react";
 
-import SongLoader from "../cmps/SongLoader.jsx";
 import ChordDisplay from "../cmps/ChordDisplay.jsx";
 
 import { getLoggedInUser } from "../services/auth.service.js";
@@ -12,6 +11,7 @@ import {
   onSongUpdate,
   onUserListUpdate,
 } from "../services/socket.service.js";
+import AdminSongPicker from "../cmps/AdminSongPicker.jsx";
 
 function SessionPage() {
   const { id: sessionId } = useParams();
@@ -65,9 +65,10 @@ function SessionPage() {
               ))}
             </List>
 
-            
-            
-            <SongLoader sessionId={sessionId} onSongLoaded={handleLoadSong} />
+            <AdminSongPicker
+              sessionId={sessionId}
+              onSongSelected={handleLoadSong}
+            />
           </Box>
         </>
       )}
