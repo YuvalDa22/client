@@ -11,7 +11,7 @@ import {
 } from "../services/auth.service.js";
 import InstrumentSelector from "../cmps/InstrumentSelector.jsx"
 
-function LoginPage() {
+function LoginPage({ setLoggedIn }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [instrument, setInstrument] = useState("");
@@ -41,6 +41,7 @@ function LoginPage() {
   async function handleLogin() {
     try {
       await login({ username, password });
+      setLoggedIn(true);
       toast.success("Login successful!");
       navigate("/");
     } catch (err) {

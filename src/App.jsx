@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Navigate } from "react-router-dom";
@@ -13,15 +14,26 @@ import AdminSignupPage from "./pages/AdminSignupPage";
 import AdminMainPage from "./pages/AdminMainPage";
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(isLoggedIn());
+
+  useEffect(() => {
+    setLoggedIn(isLoggedIn());
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setLoggedIn(isLoggedIn());
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, []);
+
   return (
     <>
-      {isLoggedIn() && <LogoutButton />}
-      {/*<AppHeader />*/} {/*To be added... */}
+      {loggedIn && <LogoutButton onLogout={() => setLoggedIn(false)} />}
       <ToastContainer position="top-center" autoClose={3000} />
       <main>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin-signup" element={<AdminSignupPage />} />
+        <Route path="/login" element={<LoginPage setLoggedIn={setLoggedIn} />} />
+        <Route path="/admin-signup" element={<AdminSignupPage />} />
 
           {/* Protected Routes */}
           <Route

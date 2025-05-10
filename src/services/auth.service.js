@@ -20,11 +20,15 @@ export async function login(credentials) {
   const res = await axios.post(`${API}/auth/login`, credentials);
   const token = res.data.token;
 
+  if (!token) throw new Error("No token received");
+
   localStorage.setItem("token", token);
   const user = jwtDecode(token);
-  localStorage.setItem("user", JSON.stringify(user)); 
+  localStorage.setItem("user", JSON.stringify(user));
+
   return user;
 }
+
 
 export async function logout() {
   localStorage.removeItem("token");
