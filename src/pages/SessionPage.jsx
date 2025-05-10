@@ -1,88 +1,88 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Input, Button, Heading, VStack, Text } from "@chakra-ui/react";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Box, Heading, Text, List, ListItem } from "@chakra-ui/react";
 
-import { createSession, joinSession } from "../services/session.service";
-import { getLoggedInUser } from "../services/auth.service";
+import SongLoader from "../cmps/SongLoader.jsx";
+import ChordDisplay from "../cmps/ChordDisplay.jsx";
 
-function SessionForm() {
-  const [user, setUser] = useState(null);
-  const [sessionId, setSessionId] = useState("");
-  const navigate = useNavigate();
+import { getLoggedInUser } from "../services/auth.service.js";
+import {
+  connectSocket,
+  disconnectSocket,
+  onSongUpdate,
+  onUserListUpdate,
+} from "../services/socket.service.js";
+
+function SessionPage() {
+  const { id: sessionId } = useParams();
+  const user = getLoggedInUser();
+
+  const [currentSong, setCurrentSong] = useState(null);
+  const [usersInSession, setUsersInSession] = useState([]);
 
   useEffect(() => {
-    const storedUser = getLoggedInUser();
-    setUser(storedUser);
-  }, []);
+    if (user && sessionId) {
+      connectSocket(sessionId, user.username, user.role);
 
-
-  async function handleCreateSession() {
-    try {
-      const res = await createSession({ userId: user.id });
-      const createdSession = res.data.session;
-      navigate(`/session/${createdSession.sessionId}`);
-    } catch (error) {
-      console.error("Error creating session:", error);
-      toast.error("Failed to create session.");
+      onSongUpdate((song) => {
+        setCurrentSong(song);
+      });
+      onUserListUpdate((users) => setUsersInSession(users));
     }
+    return () => {
+      disconnectSocket();
+    };
+  }, [sessionId]);
+
+  function handleLoadSong(song) {
+    setCurrentSong(song);
   }
 
-  async function handleJoinSession() {
-    if (!sessionId) {
-      return toast.error("Please enter a session ID");
-    }
-
-    try {
-      const res = await joinSession(sessionId, { userId: user.id });
-      navigate(`/session/${res.data.sessionId}`);
-    } catch (error) {
-      console.error("Error joining session:", error);
-      toast.error("Failed to join session.");
-    }
-  }
-
-  if(!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <Box
-      maxW="sm"
-      mx="auto"
-      mt={10}
-      p={6}
-      borderWidth={1}
-      borderRadius="md"
-      boxShadow="md"
-    >
-      <Heading mb={6} size="lg" textAlign="center">
-        Welcome, {user.username}
+    <Box maxW="4xl" mx="auto" mt={10} p={6}>
+      <Heading size="lg" mb={4}>
+        🎸 Live Jam Session
       </Heading>
-      <Text>Role: {user.role}</Text>
 
-      <VStack spacing={4}>
-        <Text>
-          Instrument: <strong>{user.instrument}</strong>
+      <Text fontSize="md" mb={6}>
+        Session ID: <strong>{sessionId}</strong>
+      </Text>
+
+      {user.role === "admin" && (
+        <>
+          <Box mt={6}>
+            <Heading size="sm" mb={2}>
+              Participants:
+            </Heading>
+
+            <List spacing={1}>
+              {usersInSession.map((user, idx) => (
+                <ListItem key={idx}>
+                  {user.username} ({user.role})
+                </ListItem>
+              ))}
+            </List>
+
+            
+            
+            <SongLoader sessionId={sessionId} onSongLoaded={handleLoadSong} />
+          </Box>
+        </>
+      )}
+
+      {!currentSong && user.role !== "admin" && (
+        <Text mt={6} fontSize="lg" textAlign="center" color="gray.500">
+          Waiting for the admin to load a song...
         </Text>
+      )}
 
-        {/* {(user?.role === "admin") && (
-          <Button colorScheme="teal" width="100%" onClick={handleCreateSession}>
-            Create New Session
-          </Button>
-        )} */}
-
-        <Input
-          placeholder="Enter session ID to join"
-          value={sessionId}
-          onChange={(e) => setSessionId(e.target.value)}
-        />
-        <Button colorScheme="blue" width="100%" onClick={handleJoinSession}>
-          Join Session
-        </Button>
-      </VStack>
+      {currentSong && (
+        <ChordDisplay instrument={user.instrument} song={currentSong} />
+      )}
     </Box>
   );
 }
 
-export default SessionForm;
+export default SessionPage;
