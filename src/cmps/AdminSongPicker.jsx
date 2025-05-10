@@ -70,7 +70,7 @@ function AdminSongPicker({ sessionId, onSongSelected }) {
         Search
       </Button>
     </form>
-    {suggestions.length > 0 && (
+    {suggestions?.length > 0 && (
       <List spacing={2} border="1px solid #ccc" borderRadius="md" p={2}>
         {suggestions.map((song) => (
           <ListItem key={song.id}>

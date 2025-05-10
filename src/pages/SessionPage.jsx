@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Heading, Text, List, ListItem } from "@chakra-ui/react";
 
+import AdminSongPicker from "../cmps/AdminSongPicker.jsx";
 import ChordDisplay from "../cmps/ChordDisplay.jsx";
 
 import { getLoggedInUser } from "../services/auth.service.js";
@@ -10,8 +11,8 @@ import {
   disconnectSocket,
   onSongUpdate,
   onUserListUpdate,
+  onCountdownStarted,
 } from "../services/socket.service.js";
-import AdminSongPicker from "../cmps/AdminSongPicker.jsx";
 
 function SessionPage() {
   const { id: sessionId } = useParams();
@@ -19,6 +20,8 @@ function SessionPage() {
 
   const [currentSong, setCurrentSong] = useState(null);
   const [usersInSession, setUsersInSession] = useState([]);
+  const [phase, setPhase] = useState("idle");
+  const [count, setCount] = useState(3);
 
   useEffect(() => {
     if (user && sessionId) {
@@ -26,13 +29,32 @@ function SessionPage() {
 
       onSongUpdate((song) => {
         setCurrentSong(song);
+        setPhase("idle");
       });
+
+      onCountdownStarted(() => {
+        setPhase("countdown");
+        setCount(3);
+      });
+
       onUserListUpdate((users) => setUsersInSession(users));
     }
+
     return () => {
       disconnectSocket();
     };
   }, [sessionId]);
+
+  useEffect(() => {
+    if (phase === "countdown" && count > 0) {
+      const timer = setTimeout(() => {
+        setCount((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (phase === "countdown" && count === 0) {
+      setPhase("display");
+    }
+  }, [phase, count]);
 
   function handleLoadSong(song) {
     setCurrentSong(song);
@@ -58,7 +80,7 @@ function SessionPage() {
             </Heading>
 
             <List spacing={1}>
-              {usersInSession.map((user, idx) => (
+              {usersInSession?.map((user, idx) => (
                 <ListItem key={idx}>
                   {user.username} ({user.role})
                 </ListItem>
@@ -80,7 +102,12 @@ function SessionPage() {
       )}
 
       {currentSong && (
-        <ChordDisplay instrument={user.instrument} song={currentSong} />
+        <ChordDisplay
+          instrument={user.instrument}
+          song={currentSong}
+          phase={phase}
+          countdown={count}
+        />
       )}
     </Box>
   );

@@ -1,31 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Box, Heading, Text, VStack } from "@chakra-ui/react";
 import useSound from "use-sound";
 import beepSfx from "../assets/beep.mp3";
-import { onCountdownStarted } from "../services/socket.service";
 
-function ChordDisplay({ song, instrument }) {
-  const [phase, setPhase] = useState("idle");
-  const [count, setCount] = useState(3);
-  const [playBeep] = useSound(beepSfx);
+function ChordDisplay({ song, instrument, phase, countdown }) {
   const showChords = instrument !== "vocals";
+  const [playBeep] = useSound(beepSfx);
 
+  
   useEffect(() => {
-    onCountdownStarted(() => {
-      setPhase("countdown");
-      setCount(3);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (phase === "countdown" && count > 0) {
+    if (phase === "countdown" && countdown > 0) {
       playBeep();
-      const timer = setTimeout(() => setCount((c) => c - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (phase === "countdown" && count === 0) {
-      setPhase("display");
     }
-  }, [count, phase, playBeep]);
+  }, [countdown, phase, playBeep]);
 
   if (!song || !song.content) return null;
 
@@ -36,7 +23,7 @@ function ChordDisplay({ song, instrument }) {
           Are you ready to jam?
         </Heading>
         <Text fontSize="6xl" color="teal.400">
-          {count > 0 ? count : null}
+          {countdown > 0 ? countdown : null}
         </Text>
       </Box>
     );
